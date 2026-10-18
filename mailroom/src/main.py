@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from src.core.config import settings
 from src.core.database import db
 from src.core.exception_handlers import ExceptionHandlers
+from src.features.emails.email_router import EmailRouter
 from src.features.health.health_router import HealthRouter
 from src.infrastructure.redis import redis_client
 
@@ -27,7 +28,8 @@ class Application:
         redis_client.close()
 
     def _register_routers(self) -> None:
-        self._app.include_router(HealthRouter().router)
+        for router in (HealthRouter().router, EmailRouter().router):
+            self._app.include_router(router)
 
 
 app = Application().app

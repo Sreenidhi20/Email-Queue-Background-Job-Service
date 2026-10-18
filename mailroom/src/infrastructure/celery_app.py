@@ -6,7 +6,10 @@ celery_app = Celery(
     "mailroom",
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL,
-    include=["src.features.health.health_tasks"],
+    include=[
+        "src.features.health.health_tasks",
+        "src.features.emails.email_tasks",
+    ],
 )
 celery_app.conf.update(  # type: ignore[reportUnknownMemberType]
     task_serializer="json",

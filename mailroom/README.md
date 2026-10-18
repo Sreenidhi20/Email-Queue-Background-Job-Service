@@ -30,6 +30,35 @@ uvicorn src.main:app --reload
 Open `http://localhost:8000/health` to check SQL and Redis. Responses use the
 project's standard `ApiResponse` envelope.
 
+## Queue and send an email
+
+Apply migrations after installing requirements; this creates the `email_jobs`
+table. Run the API and a Celery worker in separate terminals from `mailroom`:
+
+```powershell
+alembic upgrade head
+uvicorn src.main:app --reload
+```
+
+```powershell
+celery -A src.infrastructure.celery_app worker --loglevel=info --pool=solo
+```
+
+Submit an email from another PowerShell terminal:
+
+```powershell
+$body = @{ toEmail = "test@example.com"; subject = "Hello"; body = "First queued email" } | ConvertTo-Json
+$response = Invoke-RestMethod -Uri "http://localhost:8000/emails" -Method Post -Headers @{ "Idempotency-Key" = "demo-1" } -ContentType "application/json" -Body $body
+$response
+```
+
+The API returns HTTP 202 and a job ID. Check its status at
+`http://localhost:8000/emails/<job-id>` and view captured messages in Mailpit at
+`http://localhost:8025`. Reusing the same idempotency key returns the original
+job rather than enqueueing another email. List jobs with
+`GET /emails?page=1&pageSize=20`; add a `status` query parameter to filter by
+`queued`, `sending`, `sent`, `retrying`, or `dead`.
+
 ## Celery smoke test
 
 In a second terminal (also from `mailroom`), start the worker:

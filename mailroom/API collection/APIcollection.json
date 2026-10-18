@@ -1,0 +1,161 @@
+{
+  "info": {
+    "_postman_id": "4f56cd3e-5c2a-4a8a-9653-d3df86a372da",
+    "name": "Mailroom API",
+    "description": "Requests for checking Mailroom health, queueing emails, and reviewing email jobs. No authentication is configured by this API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "jobId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "mailroom-demo-1",
+      "type": "string"
+    },
+    {
+      "key": "status",
+      "value": "sent",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Checks database and Redis health."
+      },
+      "response": []
+    },
+    {
+      "name": "Queue email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 202) {",
+              "    const response = pm.response.json();",
+              "    if (response.data && response.data.id) {",
+              "        pm.collectionVariables.set('jobId', response.data.id);",
+              "        console.log('Saved job ID:', response.data.id);",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{idempotencyKey}}",
+            "type": "text",
+            "description": "Reuse this key to return the existing job without enqueueing another email. Change it to create a new job."
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"toEmail\": \"test@example.com\",\n  \"subject\": \"Mailroom Postman test\",\n  \"body\": \"Hello from the Mailroom Postman collection.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/emails",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "emails"
+          ]
+        },
+        "description": "Queues an email and stores the returned data.id in the collection variable jobId. Returns HTTP 202."
+      },
+      "response": []
+    },
+    {
+      "name": "Get email job",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/emails/{{jobId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "emails",
+            "{{jobId}}"
+          ]
+        },
+        "description": "Returns the saved job's current status. Run Queue email first."
+      },
+      "response": []
+    },
+    {
+      "name": "List email jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/emails?page=1&pageSize=20&status={{status}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "emails"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "20"
+            },
+            {
+              "key": "status",
+              "value": "{{status}}",
+              "description": "Optional: queued, sending, sent, retrying, or dead. Remove this query parameter to list all jobs."
+            }
+          ]
+        },
+        "description": "Lists up to 20 jobs filtered by the collection variable status."
+      },
+      "response": []
+    }
+  ]
+}
