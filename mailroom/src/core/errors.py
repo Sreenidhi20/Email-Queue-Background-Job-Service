@@ -7,6 +7,7 @@ class ErrorCode(str, Enum):
     EMAIL_JOB_NOT_FOUND = "EMAIL_JOB_NOT_FOUND"
     INVALID_SEND_AT = "INVALID_SEND_AT"
     SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE"
+    QUEUE_UNAVAILABLE = "QUEUE_UNAVAILABLE"
     INTERNAL = "INTERNAL"
 
 
@@ -17,6 +18,7 @@ class ErrorCatalog:
         ErrorCode.EMAIL_JOB_NOT_FOUND: "Email job not found",
         ErrorCode.INVALID_SEND_AT: "Scheduled time must be in the future",
         ErrorCode.SERVICE_UNAVAILABLE: "A dependency is unavailable",
+        ErrorCode.QUEUE_UNAVAILABLE: "Email queue is unavailable",
         ErrorCode.INTERNAL: "Something went wrong on our side",
     }
 

@@ -34,6 +34,14 @@ class EmailQuery:
             self._session.rollback()
             raise
 
+    def delete(self, job: EmailJob) -> None:
+        try:
+            self._session.delete(job)
+            self._session.commit()
+        except SQLAlchemyError:
+            self._session.rollback()
+            raise
+
     def get_by_id(self, job_id: UUID) -> EmailJob | None:
         return self._session.get(EmailJob, job_id)
 

@@ -4,7 +4,12 @@ from uuid import UUID
 
 from src.core.dto import PageDto
 from src.core.enums import EmailStatus
-from src.core.errors import BadRequestError, ErrorCode, NotFoundError
+from src.core.errors import (
+    BadRequestError,
+    ErrorCode,
+    NotFoundError,
+    ServiceUnavailableError,
+)
 from src.domain.email_job import EmailJob
 from src.features.emails.dto.email_dto import (
     CreateEmailRequestDto,
@@ -18,6 +23,8 @@ class EmailServiceQueryPort(Protocol):
     def save(self, job: EmailJob) -> EmailJob: ...
 
     def set_celery_task_id(self, job_id: UUID, task_id: str) -> None: ...
+
+    def delete(self, job: EmailJob) -> None: ...
 
     def get_by_id(self, job_id: UUID) -> EmailJob | None: ...
 
@@ -116,9 +123,15 @@ class EmailService:
         )
 
     def _enqueue(self, job: EmailJob) -> None:
-        task_id = self._send_task.apply_async(
-            args=[str(job.id)], eta=job.scheduled_for
-        )
+        try:
+            task_id = self._send_task.apply_async(
+                args=[str(job.id)], eta=job.scheduled_for
+            )
+        except ServiceUnavailableError:
+            # The row was committed before publishing. Remove it so a client
+            # retry (even with the same Idempotency-Key) starts clean.
+            self._query.delete(job)
+            raise
         self._query.set_celery_task_id(job.id, task_id)
 
     @staticmethod
