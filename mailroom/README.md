@@ -19,8 +19,18 @@ environment file. Keep it local and do not commit it. For a fresh setup without
 that file, copy `.env.example` to `.env`; it uses local SQLite. Set `REDIS_URL`
 in `.env` if Redis is not running at its default local address.
 
-Start Redis and Mailpit using the Docker commands in the project build plan, then
-apply the database migration and run the API:
+Start Docker Desktop, then from the `mailroom` directory start Redis and Mailpit:
+
+```powershell
+docker compose up -d redis mailpit
+docker compose ps
+```
+
+Wait until both containers show as running. If Docker reports that it cannot
+connect to the Docker API, start Docker Desktop and retry. The Compose file
+starts Redis and Mailpit only; run the API and Celery worker as local processes.
+
+Apply the database migration and run the API:
 
 ```powershell
 alembic upgrade head
@@ -33,7 +43,8 @@ project's standard `ApiResponse` envelope.
 ## Queue and send an email
 
 Apply migrations after installing requirements; this creates the `email_jobs`
-table. Run the API and a Celery worker in separate terminals from `mailroom`:
+table. Keep Redis and Mailpit running in Docker. Run the API and Celery worker
+in separate terminals from `mailroom` (with the virtual environment activated):
 
 ```powershell
 alembic upgrade head
