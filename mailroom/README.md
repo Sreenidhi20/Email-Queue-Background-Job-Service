@@ -59,6 +59,19 @@ job rather than enqueueing another email. List jobs with
 `GET /emails?page=1&pageSize=20`; add a `status` query parameter to filter by
 `queued`, `sending`, `sent`, `retrying`, or `dead`.
 
+## Scheduled (delayed) emails
+
+Add `sendAt` to `POST /emails` to send later, for example
+`"sendAt": "2026-10-25T09:00:00+05:30"`. The job is saved with status `queued` and
+`scheduledFor` set, and the worker holds it until that time. Rules:
+
+- Always include a timezone offset or `Z`. A `sendAt` without one is treated as **UTC**.
+- It must be in the future and at most `MAX_SEND_AHEAD_DAYS` (default 7, allowed 1 to 30)
+  days ahead. Otherwise the API returns 400 with `INVALID_SEND_AT` or `SEND_AT_TOO_FAR`.
+- Redis re-delivers messages that stay unacknowledged longer than its visibility timeout,
+  so Mailroom sets that timeout to `MAX_SEND_AHEAD_DAYS + 1` days (see `celery_app.py`).
+  The worker also never sends a job that is already `sent`.
+
 ## Retry behavior
 
 If sending fails, the worker retries with exponential backoff and jitter. After

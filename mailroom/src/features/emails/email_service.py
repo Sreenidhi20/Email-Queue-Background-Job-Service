@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Protocol
 from uuid import UUID
 
@@ -41,6 +41,7 @@ class EmailTaskPublisher(Protocol):
 
 class EmailService:
     DEFAULT_MAX_ATTEMPTS = 5
+    DEFAULT_MAX_SEND_AHEAD_DAYS = 7
     _MAX_PAGE_SIZE = 100
 
     def __init__(
@@ -48,11 +49,14 @@ class EmailService:
         query: EmailServiceQueryPort,
         send_task: EmailTaskPublisher,
         max_attempts: int = DEFAULT_MAX_ATTEMPTS,
+        max_send_ahead_days: int = DEFAULT_MAX_SEND_AHEAD_DAYS,
     ) -> None:
         self._query = query
         self._send_task = send_task
         self._max_attempts = self.DEFAULT_MAX_ATTEMPTS
         self.max_attempts = max_attempts
+        self._max_send_ahead = timedelta(days=self.DEFAULT_MAX_SEND_AHEAD_DAYS)
+        self.max_send_ahead_days = max_send_ahead_days
 
     @property
     def max_attempts(self) -> int:
@@ -63,6 +67,16 @@ class EmailService:
         if not 1 <= value <= 10:
             raise ValueError("max_attempts must be between 1 and 10")
         self._max_attempts = value
+
+    @property
+    def max_send_ahead_days(self) -> int:
+        return self._max_send_ahead.days
+
+    @max_send_ahead_days.setter
+    def max_send_ahead_days(self, value: int) -> None:
+        if not 1 <= value <= 30:
+            raise ValueError("max_send_ahead_days must be between 1 and 30")
+        self._max_send_ahead = timedelta(days=value)
 
     def create(
         self,
@@ -75,7 +89,7 @@ class EmailService:
                 return EmailJobResponseDto.model_validate(existing)
 
         send_at = self._normalize_utc(dto.send_at)
-        self._ensure_in_future(send_at)
+        self._ensure_schedulable(send_at)
 
         job = self._query.add(
             self._build_job(dto, send_at, idempotency_key)
@@ -142,12 +156,19 @@ class EmailService:
             return value.replace(tzinfo=timezone.utc)
         return value.astimezone(timezone.utc)
 
-    @staticmethod
-    def _ensure_in_future(send_at: datetime | None) -> None:
-        if send_at is not None and send_at <= datetime.now(timezone.utc):
+    def _ensure_schedulable(self, send_at: datetime | None) -> None:
+        if send_at is None:
+            return
+        now = datetime.now(timezone.utc)
+        if send_at <= now:
             raise BadRequestError(
                 ErrorCode.INVALID_SEND_AT,
                 "sendAt must be a future date and time",
+            )
+        if send_at > now + self._max_send_ahead:
+            raise BadRequestError(
+                ErrorCode.SEND_AT_TOO_FAR,
+                f"sendAt can be at most {self.max_send_ahead_days} days ahead",
             )
 
     def __repr__(self) -> str:
