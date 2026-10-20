@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 1025
+    RETRY_BASE_SECONDS: int = 10
+    RETRY_MAX_SECONDS: int = 600
 
 
 settings = Settings()

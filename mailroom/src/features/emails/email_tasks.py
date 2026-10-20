@@ -2,12 +2,15 @@ from datetime import datetime, timezone
 from typing import Protocol
 from uuid import UUID
 
+from celery import Task  # type: ignore[reportMissingTypeStubs]
+
 from src.core.database import db
 from src.core.enums import EmailStatus
 from src.domain.email_job import EmailJob
 from src.features.emails.email_query import EmailQuery
 from src.infrastructure.celery_app import celery_app
 from src.infrastructure.mailer import MailerError, mailer
+from src.infrastructure.retry_policy import retry_policy
 
 
 class EmailWorkerQueryPort(Protocol):
@@ -38,8 +41,12 @@ class EmailSendHandler:
         try:
             self._mailer.send(job.to_email, job.subject, job.body)
         except MailerError as error:
-            job.status = EmailStatus.RETRYING
             job.last_error = str(error)
+            if job.attempts >= job.max_attempts:
+                job.status = EmailStatus.DEAD    # out of attempts: stop retrying
+                self._query.save(job)
+                return "dead"
+            job.status = EmailStatus.RETRYING
             self._query.save(job)
             raise
 
@@ -51,8 +58,15 @@ class EmailSendHandler:
 
 
 @celery_app.task(  # type: ignore[reportUnknownMemberType, reportUntypedFunctionDecorator]
-    name="emails.send"
+    bind=True,
+    name="emails.send",
+    max_retries=None,  # our handler decides when to stop (job.max_attempts)
 )
-def send_email_task(job_id: str) -> str:
+def send_email_task(self: Task, job_id: str) -> str:  # type: ignore[reportMissingTypeArgument]
     with db.session_scope() as session:
-        return EmailSendHandler(EmailQuery(session), mailer).handle(job_id)
+        handler = EmailSendHandler(EmailQuery(session), mailer)
+        try:
+            return handler.handle(job_id)
+        except MailerError as error:
+            delay = retry_policy.delay_for(self.request.retries)
+            raise self.retry(exc=error, countdown=delay) from error

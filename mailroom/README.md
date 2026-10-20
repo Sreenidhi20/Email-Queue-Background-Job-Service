@@ -59,6 +59,13 @@ job rather than enqueueing another email. List jobs with
 `GET /emails?page=1&pageSize=20`; add a `status` query parameter to filter by
 `queued`, `sending`, `sent`, `retrying`, or `dead`.
 
+## Retry behavior
+
+If sending fails, the worker retries with exponential backoff and jitter. After
+`max_attempts` is reached (5 by default), the job is marked `dead` and is not
+retried again. Configure the backoff in `.env` with `RETRY_BASE_SECONDS` (default
+`10`) and `RETRY_MAX_SECONDS` (default `600`).
+
 ## Celery smoke test
 
 In a second terminal (also from `mailroom`), start the worker:
@@ -79,5 +86,5 @@ The result should be `pong: hello`. Run the focused test suite with:
 python -m unittest discover -s tests -v
 ```
 
-See [docs/python-type-checking-checklist.md](docs/python-type-checking-checklist.md)
+See [../.github/docs/python-type-checking-checklist.md](../.github/docs/python-type-checking-checklist.md)
 for the Pylance checklist and the current test diagnostics audit.

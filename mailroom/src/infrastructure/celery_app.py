@@ -18,5 +18,6 @@ celery_app.conf.update(  # type: ignore[reportUnknownMemberType]
     timezone="UTC",
     enable_utc=True,
     task_acks_late=True,
+    task_ignore_result=True,  # job state lives in the database, not the result backend
     worker_prefetch_multiplier=1,
 )

@@ -56,6 +56,9 @@ class FakeEmailQuery:
     def set_celery_task_id(self, job_id: UUID, task_id: str) -> None:
         self.jobs[job_id].celery_task_id = task_id
 
+    def delete(self, job: EmailJob) -> None:
+        self.jobs.pop(job.id, None)
+
     def get_by_id(self, job_id: UUID) -> EmailJob | None:
         return self.jobs.get(job_id)
 
