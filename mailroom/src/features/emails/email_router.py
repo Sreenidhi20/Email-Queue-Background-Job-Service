@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, Query
 from sqlalchemy.orm import Session
 
+from src.core.config import settings
 from src.core.database import db
 from src.core.dto import PageDto
 from src.core.enums import EmailStatus
@@ -22,6 +23,7 @@ def get_email_service(
     return EmailService(
         EmailQuery(session),
         CeleryTaskPublisher("emails.send"),
+        max_send_ahead_days=settings.MAX_SEND_AHEAD_DAYS,
     )
 
 

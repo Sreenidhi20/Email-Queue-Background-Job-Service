@@ -18,6 +18,9 @@ celery_app.conf.update(  # type: ignore[reportUnknownMemberType]
     timezone="UTC",
     enable_utc=True,
     task_acks_late=True,
+    broker_transport_options={
+        "visibility_timeout": settings.redis_visibility_timeout_seconds
+    },
     task_ignore_result=True,  # job state lives in the database, not the result backend
     worker_prefetch_multiplier=1,
 )
