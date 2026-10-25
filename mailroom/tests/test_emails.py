@@ -42,6 +42,7 @@ def make_job(
 class FakeEmailQuery:
     def __init__(self) -> None:
         self.jobs: dict[UUID, EmailJob] = {}
+        self.dead_job_ids: list[UUID] = []
 
     def add(self, job: EmailJob) -> EmailJob:
         job.id = uuid4()
@@ -55,6 +56,10 @@ class FakeEmailQuery:
 
     def set_celery_task_id(self, job_id: UUID, task_id: str) -> None:
         self.jobs[job_id].celery_task_id = task_id
+
+    def save_as_dead(self, job: EmailJob) -> EmailJob:
+        self.dead_job_ids.append(job.id)
+        return self.save(job)
 
     def delete(self, job: EmailJob) -> None:
         self.jobs.pop(job.id, None)
@@ -233,6 +238,16 @@ class EmailSendHandlerTests(unittest.TestCase):
         result = self.handler.handle(str(self.job.id))
 
         self.assertEqual(result, "already-sent")
+        self.assertEqual(self.mailer.sent, [])
+
+    def test_handle_does_not_retry_already_dead_job(self) -> None:
+        self.job.status = EmailStatus.DEAD
+        self.job.attempts = self.job.max_attempts
+
+        result = self.handler.handle(str(self.job.id))
+
+        self.assertEqual(result, "already-dead")
+        self.assertEqual(self.job.attempts, self.job.max_attempts)
         self.assertEqual(self.mailer.sent, [])
 
     def test_handle_records_mailer_failure_and_reraises(self) -> None:

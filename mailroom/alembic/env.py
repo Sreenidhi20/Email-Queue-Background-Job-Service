@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 
 from src.core.config import settings
 from src.domain.base import Base
+from src.domain.dead_letter import DeadLetter
 from src.domain.email_job import EmailJob
 from src.domain.health_check import HealthCheck
 
@@ -15,7 +16,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
-__all__ = ["EmailJob", "HealthCheck", "target_metadata"]
+__all__ = ["DeadLetter", "EmailJob", "HealthCheck", "target_metadata"]
 
 
 def run_migrations_offline() -> None:

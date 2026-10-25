@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from src.core.enums import EmailStatus
+from src.domain.dead_letter import DeadLetter
 from src.domain.email_job import EmailJob
 
 
@@ -19,6 +20,19 @@ class EmailQuery:
         return self._commit(job)
 
     def save(self, job: EmailJob) -> EmailJob:
+        return self._commit(job)
+
+    def save_as_dead(self, job: EmailJob) -> EmailJob:
+        """Persist the dead job and its dead-letter record in ONE commit."""
+        self._session.add(
+            DeadLetter(
+                email_job_id=job.id,
+                to_email=job.to_email,
+                subject=job.subject,
+                error=job.last_error or "Unknown error",
+                attempts=job.attempts,
+            )
+        )
         return self._commit(job)
 
     def set_celery_task_id(self, job_id: UUID, task_id: str) -> None:

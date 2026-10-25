@@ -19,8 +19,18 @@ environment file. Keep it local and do not commit it. For a fresh setup without
 that file, copy `.env.example` to `.env`; it uses local SQLite. Set `REDIS_URL`
 in `.env` if Redis is not running at its default local address.
 
-Start Redis and Mailpit using the Docker commands in the project build plan, then
-apply the database migration and run the API:
+Start Docker Desktop, then from the `mailroom` directory start Redis and Mailpit:
+
+```powershell
+docker compose up -d redis mailpit
+docker compose ps
+```
+
+Wait until both containers show as running. If Docker reports that it cannot
+connect to the Docker API, start Docker Desktop and retry. The Compose file
+starts Redis and Mailpit only; run the API and Celery worker as local processes.
+
+Apply the database migration and run the API:
 
 ```powershell
 alembic upgrade head
@@ -33,7 +43,8 @@ project's standard `ApiResponse` envelope.
 ## Queue and send an email
 
 Apply migrations after installing requirements; this creates the `email_jobs`
-table. Run the API and a Celery worker in separate terminals from `mailroom`:
+table. Keep Redis and Mailpit running in Docker. Run the API and Celery worker
+in separate terminals from `mailroom` (with the virtual environment activated):
 
 ```powershell
 alembic upgrade head
@@ -71,6 +82,22 @@ Add `sendAt` to `POST /emails` to send later, for example
 - Redis re-delivers messages that stay unacknowledged longer than its visibility timeout,
   so Mailroom sets that timeout to `MAX_SEND_AHEAD_DAYS + 1` days (see `celery_app.py`).
   The worker also never sends a job that is already `sent`.
+
+## Dead letters and replay
+
+When a job uses up its `max_attempts`, it becomes `dead` and a row is written to
+`dead_letters` (a snapshot of the recipient, subject, last error and attempt count) in
+the same database transaction.
+
+| Request | Purpose |
+| --- | --- |
+| `GET /dead-letters?replayed=false&page=1&pageSize=20` | List dead letters; `replayed` filter is optional |
+| `GET /dead-letters/{id}` | One dead letter |
+| `POST /dead-letters/{id}/replay` | Reset the job to `queued` (attempts back to 0) and publish it again; returns 202 |
+
+Replay returns 409 if the letter was already replayed (`DEAD_LETTER_ALREADY_REPLAYED`) or
+the job is no longer `dead` (`EMAIL_JOB_NOT_DEAD`), and 503 if Redis is unreachable (nothing
+is changed in that case). Run `alembic upgrade head` to create the new table.
 
 ## Retry behavior
 
