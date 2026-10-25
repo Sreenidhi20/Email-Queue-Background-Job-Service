@@ -7,3 +7,9 @@ class EmailStatus(str, Enum):
     SENT = "sent"
     RETRYING = "retrying"
     DEAD = "dead"
+
+
+class ReplayOutcome(str, Enum):
+    REPLAYED = "replayed"
+    ALREADY_REPLAYED = "already_replayed"
+    JOB_NOT_DEAD = "job_not_dead"
