@@ -83,6 +83,22 @@ Add `sendAt` to `POST /emails` to send later, for example
   so Mailroom sets that timeout to `MAX_SEND_AHEAD_DAYS + 1` days (see `celery_app.py`).
   The worker also never sends a job that is already `sent`.
 
+## Dead letters and replay
+
+When a job uses up its `max_attempts`, it becomes `dead` and a row is written to
+`dead_letters` (a snapshot of the recipient, subject, last error and attempt count) in
+the same database transaction.
+
+| Request | Purpose |
+| --- | --- |
+| `GET /dead-letters?replayed=false&page=1&pageSize=20` | List dead letters; `replayed` filter is optional |
+| `GET /dead-letters/{id}` | One dead letter |
+| `POST /dead-letters/{id}/replay` | Reset the job to `queued` (attempts back to 0) and publish it again; returns 202 |
+
+Replay returns 409 if the letter was already replayed (`DEAD_LETTER_ALREADY_REPLAYED`) or
+the job is no longer `dead` (`EMAIL_JOB_NOT_DEAD`), and 503 if Redis is unreachable (nothing
+is changed in that case). Run `alembic upgrade head` to create the new table.
+
 ## Retry behavior
 
 If sending fails, the worker retries with exponential backoff and jitter. After

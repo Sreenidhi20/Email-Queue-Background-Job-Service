@@ -18,6 +18,8 @@ class EmailWorkerQueryPort(Protocol):
 
     def save(self, job: EmailJob) -> EmailJob: ...
 
+    def save_as_dead(self, job: EmailJob) -> EmailJob: ...
+
 
 class EmailMailer(Protocol):
     def send(self, to_email: str, subject: str, body: str) -> None: ...
@@ -34,6 +36,8 @@ class EmailSendHandler:
             return "missing"
         if job.status == EmailStatus.SENT:
             return "already-sent"
+        if job.status == EmailStatus.DEAD:
+            return "already-dead"
 
         job.status = EmailStatus.SENDING
         job.attempts += 1
@@ -44,7 +48,7 @@ class EmailSendHandler:
             job.last_error = str(error)
             if job.attempts >= job.max_attempts:
                 job.status = EmailStatus.DEAD    # out of attempts: stop retrying
-                self._query.save(job)
+                self._query.save_as_dead(job)
                 return "dead"
             job.status = EmailStatus.RETRYING
             self._query.save(job)

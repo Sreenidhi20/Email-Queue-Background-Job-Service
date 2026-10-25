@@ -63,6 +63,7 @@ class DeadAfterMaxAttemptsTests(unittest.TestCase):
         self.assertEqual(self.job.status, EmailStatus.DEAD)
         self.assertEqual(self.job.attempts, 3)
         self.assertEqual(self.job.last_error, "SMTP unavailable")
+        self.assertEqual(self.query.dead_job_ids, [self.job.id])
 
 
 class FailingPublisher:
