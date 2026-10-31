@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     RETRY_BASE_SECONDS: int = 10
     RETRY_MAX_SECONDS: int = 600
     MAX_SEND_AHEAD_DAYS: int = Field(default=7, ge=1, le=30)
+    FLOWER_USER: str = ""
+    FLOWER_PASSWORD: str = ""
+    FLOWER_PORT: int = Field(default=5555, ge=1024, le=65535)
     SENT_RETENTION_DAYS: int = Field(default=30, ge=1, le=365)
     DIGEST_TO_EMAIL: str | None = None
     # Beat runs in UTC. 21:30 UTC = 03:00 IST, 02:30 UTC = 08:00 IST.

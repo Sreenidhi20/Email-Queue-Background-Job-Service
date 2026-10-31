@@ -25,6 +25,8 @@ celery_app.conf.update(  # type: ignore[reportUnknownMemberType]
     },
     task_ignore_result=True,  # job state lives in the database, not the result backend
     worker_prefetch_multiplier=1,
+    worker_send_task_events=True,  # Flower sees task start/finish without the -E flag
+    task_send_sent_event=True,  # Flower sees tasks that are queued but not yet picked up
     beat_schedule={
         "cleanup-sent-jobs": {
             "task": "maintenance.cleanup_sent_jobs",

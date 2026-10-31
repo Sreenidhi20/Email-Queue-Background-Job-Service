@@ -121,6 +121,24 @@ celery -A src.infrastructure.celery_app beat --loglevel=info
 
 Beat writes a local `celerybeat-schedule` file (already git-ignored).
 
+## Flower dashboard
+
+Flower shows workers, queues, and task states, and allows authorized users to inspect
+or revoke tasks. Set `FLOWER_USER` and a unique `FLOWER_PASSWORD` in `.env` before
+starting it; Flower will refuse to start without valid credentials.
+
+Run Flower in another terminal from `mailroom`, alongside the API, worker, and Beat:
+
+```powershell
+python -m src.infrastructure.flower_launcher
+```
+
+Open `http://localhost:5555` and sign in. The dashboard persists task history in
+`flower.db` (git-ignored). Task arguments contain job IDs, not email content.
+
+Run exactly one Flower process. Protect its dashboard and API endpoints from
+unauthorized access; do not expose it directly to the public internet.
+
 ## Retry behavior
 
 If sending fails, the worker retries with exponential backoff and jitter. After

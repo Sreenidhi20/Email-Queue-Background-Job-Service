@@ -4,3 +4,4 @@ __pycache__/
 *.py[cod]
 .venv/
 celerybeat-schedule*
+flower.db
