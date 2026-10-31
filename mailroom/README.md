@@ -99,6 +99,28 @@ Replay returns 409 if the letter was already replayed (`DEAD_LETTER_ALREADY_REPL
 the job is no longer `dead` (`EMAIL_JOB_NOT_DEAD`), and 503 if Redis is unreachable (nothing
 is changed in that case). Run `alembic upgrade head` to create the new table.
 
+## Scheduled jobs (Celery Beat)
+
+Two cron jobs run in **UTC** (defaults shown with their IST equivalent):
+
+| Task | Default time | What it does |
+| --- | --- | --- |
+| `maintenance.cleanup_sent_jobs` | 21:30 UTC (03:00 IST) | Deletes `sent` jobs older than `SENT_RETENTION_DAYS` (default 30). Jobs in any other status, including `dead`, are never deleted. |
+| `maintenance.daily_digest` | 02:30 UTC (08:00 IST) | Queues an email to `DIGEST_TO_EMAIL` with counts for the last 24 hours (sent, died, queued, retrying, dead letters to review). Skipped if `DIGEST_TO_EMAIL` is empty. |
+
+The digest goes through the normal email queue, so it is retried, dead-lettered and
+replayable like any other email. It uses the idempotency key `daily-digest-<date>`, so it
+is sent at most once per UTC day even if Beat fires twice. Change the times with the
+`*_HOUR_UTC` / `*_MINUTE_UTC` settings.
+
+Run Beat in a third terminal, next to the API and the worker (run **exactly one** Beat):
+
+```powershell
+celery -A src.infrastructure.celery_app beat --loglevel=info
+```
+
+Beat writes a local `celerybeat-schedule` file (already git-ignored).
+
 ## Retry behavior
 
 If sending fails, the worker retries with exponential backoff and jitter. After

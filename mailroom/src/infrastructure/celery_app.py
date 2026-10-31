@@ -1,4 +1,5 @@
 from celery import Celery  # type: ignore[reportMissingTypeStubs]
+from celery.schedules import crontab  # type: ignore[reportMissingTypeStubs]
 
 from src.core.config import settings
 
@@ -9,6 +10,7 @@ celery_app = Celery(
     include=[
         "src.features.health.health_tasks",
         "src.features.emails.email_tasks",
+        "src.features.maintenance.maintenance_tasks",
     ],
 )
 celery_app.conf.update(  # type: ignore[reportUnknownMemberType]
@@ -23,4 +25,18 @@ celery_app.conf.update(  # type: ignore[reportUnknownMemberType]
     },
     task_ignore_result=True,  # job state lives in the database, not the result backend
     worker_prefetch_multiplier=1,
+    beat_schedule={
+        "cleanup-sent-jobs": {
+            "task": "maintenance.cleanup_sent_jobs",
+            "schedule": crontab(
+                hour=settings.CLEANUP_HOUR_UTC, minute=settings.CLEANUP_MINUTE_UTC
+            ),
+        },
+        "daily-digest": {
+            "task": "maintenance.daily_digest",
+            "schedule": crontab(
+                hour=settings.DIGEST_HOUR_UTC, minute=settings.DIGEST_MINUTE_UTC
+            ),
+        },
+    },
 )
