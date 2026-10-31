@@ -2,11 +2,28 @@
   "info": {
     "_postman_id": "4f56cd3e-5c2a-4a8a-9653-d3df86a372da",
     "name": "Mailroom API",
-    "description": "Requests for checking Mailroom health, queueing emails, and reviewing email jobs. No authentication is configured by this API.",
+    "description": "Requests for checking health, queueing emails, and reviewing or replaying dead letters. An API key is required except for the health check.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
-    "type": "noauth"
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-API-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
   },
   "variable": [
     {
@@ -28,6 +45,16 @@
       "key": "status",
       "value": "sent",
       "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "dev-key-change-me-0123456789",
+      "type": "string"
+    },
+    {
+      "key": "deadLetterId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -45,7 +72,10 @@
             "health"
           ]
         },
-        "description": "Checks database and Redis health."
+        "description": "Checks database and Redis health.",
+        "auth": {
+          "type": "noauth"
+        }
       },
       "response": []
     },
@@ -154,6 +184,114 @@
           ]
         },
         "description": "Lists up to 20 jobs filtered by the collection variable status."
+      },
+      "response": []
+    },
+    {
+      "name": "Queue scheduled email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/emails",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "emails"
+          ]
+        },
+        "description": "Send later. Include a timezone offset or Z; without one the time is treated as UTC. At most MAX_SEND_AHEAD_DAYS ahead.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"toEmail\": \"test@example.com\",\n  \"subject\": \"Scheduled from Postman\",\n  \"body\": \"This was scheduled.\",\n  \"sendAt\": \"2026-12-01T09:00:00+05:30\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 202) { pm.collectionVariables.set('jobId', pm.response.json().data.id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List dead letters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/dead-letters?replayed=false&page=1&pageSize=20",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "dead-letters"
+          ],
+          "query": [
+            {
+              "key": "replayed",
+              "value": "false"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "20"
+            }
+          ]
+        },
+        "description": "Emails that ran out of attempts. Saves the first id into deadLetterId."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const r = pm.response.json();",
+              "if (r.data && r.data.items && r.data.items.length) { pm.collectionVariables.set('deadLetterId', r.data.items[0].id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Replay dead letter",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/dead-letters/{{deadLetterId}}/replay",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "dead-letters",
+            "{{deadLetterId}}",
+            "replay"
+          ]
+        },
+        "description": "Re-queues the dead email from attempt 0. Returns 202; a second call returns 409."
       },
       "response": []
     }

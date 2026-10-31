@@ -1,3 +1,35 @@
+# Two ways to use this file (run from the mailroom folder):
+#
+#   docker compose up -d
+#       Only Redis and Mailpit. Run the API, worker, Beat and Flower yourself from your
+#       virtualenv while developing.
+#
+#   docker compose --profile app up --build
+#       The whole system in containers: Postgres, migrations, API, worker, Beat, Flower.
+#       API  http://localhost:8000/docs      Flower  http://localhost:5555
+#       Mailpit inbox  http://localhost:8025
+
+x-app: &app
+  build: .
+  profiles: ["app"]
+  restart: unless-stopped
+  environment: &app-env
+    DATABASE_URL: postgresql+psycopg://mailroom:mailroom@postgres:5432/mailroom
+    REDIS_URL: redis://redis:6379/0
+    SMTP_HOST: mailpit
+    SMTP_PORT: "1025"
+    API_KEYS: ${API_KEYS:-dev:dev-key-change-me-0123456789}
+    FLOWER_USER: ${FLOWER_USER:-admin}
+    FLOWER_PASSWORD: ${FLOWER_PASSWORD:-change-me-please}
+    DIGEST_TO_EMAIL: ${DIGEST_TO_EMAIL:-}
+  depends_on:
+    redis:
+      condition: service_healthy
+    mailpit:
+      condition: service_started
+    migrate:
+      condition: service_completed_successfully
+
 services:
   redis:
     image: redis:7
@@ -5,11 +37,67 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   mailpit:
     image: axllent/mailpit
     ports:
       - "8025:8025" # web inbox at http://localhost:8025
-      - "1025:1025" # SMTP port your Mailer sends to
+      - "1025:1025" # SMTP port the Mailer sends to
+
+  postgres:
+    image: postgres:16
+    profiles: ["app"]
+    environment:
+      POSTGRES_USER: mailroom
+      POSTGRES_PASSWORD: mailroom
+      POSTGRES_DB: mailroom
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mailroom -d mailroom"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build: .
+    profiles: ["app"]
+    environment: *app-env
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    <<: *app
+    command: ["celery", "-A", "src.infrastructure.celery_app", "worker", "--loglevel=info"]
+
+  beat:
+    <<: *app
+    # Run exactly ONE beat, or every cron job fires twice.
+    command: ["celery", "-A", "src.infrastructure.celery_app", "beat", "--loglevel=info", "--schedule=/tmp/celerybeat-schedule"]
+
+  flower:
+    <<: *app
+    command: ["python", "-m", "src.infrastructure.flower_launcher"]
+    ports:
+      - "127.0.0.1:5555:5555"
 
 volumes:
   redis_data:
+  postgres_data:

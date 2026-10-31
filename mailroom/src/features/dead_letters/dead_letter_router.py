@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from src.core.database import db
 from src.core.dto import PageDto
 from src.core.responses import ApiResponse
+from src.core.security import api_key_auth
 from src.features.dead_letters.dead_letter_query import DeadLetterQuery
 from src.features.dead_letters.dead_letter_service import DeadLetterService
 from src.features.dead_letters.dto.dead_letter_dto import (
@@ -26,7 +27,11 @@ def get_dead_letter_service(
 
 class DeadLetterRouter:
     def __init__(self) -> None:
-        self._router = APIRouter(prefix="/dead-letters", tags=["Dead letters"])
+        self._router = APIRouter(
+            prefix="/dead-letters",
+            tags=["Dead letters"],
+            dependencies=[Depends(api_key_auth)],
+        )
         self._register_routes()
 
     @property

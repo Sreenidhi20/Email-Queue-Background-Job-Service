@@ -24,16 +24,25 @@ class ExceptionHandlers:
         app.add_exception_handler(Exception, ExceptionHandlers._on_unhandled)
 
     @staticmethod
-    def _to_json(status_code: int, detail: str, error: str) -> JSONResponse:
+    def _to_json(
+        status_code: int,
+        detail: str,
+        error: str,
+        headers: dict[str, str] | None = None,
+    ) -> JSONResponse:
         body = ApiResponse.fail(status_code, detail, error)
-        return JSONResponse(status_code=status_code, content=body.model_dump(by_alias=True))
+        return JSONResponse(
+            status_code=status_code,
+            content=body.model_dump(by_alias=True),
+            headers=headers,
+        )
 
     @staticmethod
     async def _on_app_error(_request: Request, exc: Exception) -> JSONResponse:
         if not isinstance(exc, AppError):
             raise exc
         return ExceptionHandlers._to_json(
-            exc.status_code, exc.detail, exc.error_text
+            exc.status_code, exc.detail, exc.error_text, exc.headers
         )
 
     @staticmethod

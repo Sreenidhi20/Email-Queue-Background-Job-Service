@@ -9,6 +9,8 @@ The collection uses these variables:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `baseUrl` | `http://localhost:8000` | Mailroom API root. Change the host or port here if your API runs elsewhere. |
+| `apiKey` | `dev-key-change-me-0123456789` | Sent as the `X-API-Key` header on every request except Health. Must match a key in the server's `API_KEYS`. |
+| `deadLetterId` | empty | Filled by **List dead letters**; used by **Replay dead letter**. |
 | `jobId` | empty | Filled automatically from the `data.id` returned by **Queue email**. |
 | `idempotencyKey` | `mailroom-demo-1` | Identifies a create request. Keep the same value to test duplicate submission; change it to queue a new email. |
 | `status` | `sent` | Optional job-list filter. Supported values are `queued`, `sending`, `sent`, `retrying`, and `dead`. |
@@ -20,11 +22,14 @@ All request URLs use `{{baseUrl}}`. The requests included are:
 | Health | `GET {{baseUrl}}/health` | Checks database and Redis connectivity. |
 | Queue email | `POST {{baseUrl}}/emails` | Creates a job and queues the email; expects HTTP `202`. |
 | Get email job | `GET {{baseUrl}}/emails/{{jobId}}` | Checks the job status. Run **Queue email** first. |
+| Queue scheduled email | `POST {{baseUrl}}/emails` | Same as Queue email with `sendAt` (include a timezone offset). |
+| List dead letters | `GET {{baseUrl}}/dead-letters?replayed=false` | Emails that failed permanently. |
+| Replay dead letter | `POST {{baseUrl}}/dead-letters/{{deadLetterId}}/replay` | Re-queues one; a second call returns `409`. |
 | List email jobs | `GET {{baseUrl}}/emails?page=1&pageSize=20&status={{status}}` | Lists jobs filtered by status. Remove the `status` query parameter to list all jobs. |
 
 ## Authentication
 
-Choose **No Auth** in Postman if prompted. The current Mailroom endpoints do not require an authentication token, username/password, API key, or cookies. The `Idempotency-Key` header is for duplicate-request handling; it is **not** an authentication credential.
+The collection sends the `X-API-Key` header (collection variable `apiKey`) on every request except **Health**. A missing or wrong key returns `401`. The `Idempotency-Key` header is separate: it only prevents duplicate sends and is **not** a credential.
 
 ## Queue email body
 

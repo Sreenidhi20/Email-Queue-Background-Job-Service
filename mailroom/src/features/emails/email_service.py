@@ -6,6 +6,7 @@ from src.core.dto import PageDto
 from src.core.enums import EmailStatus
 from src.core.errors import (
     BadRequestError,
+    DuplicateKeyError,
     ErrorCode,
     NotFoundError,
     ServiceUnavailableError,
@@ -91,9 +92,15 @@ class EmailService:
         send_at = self._normalize_utc(dto.send_at)
         self._ensure_schedulable(send_at)
 
-        job = self._query.add(
-            self._build_job(dto, send_at, idempotency_key)
-        )
+        try:
+            job = self._query.add(
+                self._build_job(dto, send_at, idempotency_key)
+            )
+        except DuplicateKeyError:
+            winner = self._query.get_by_idempotency_key(idempotency_key or "")
+            if winner is None:
+                raise
+            return EmailJobResponseDto.model_validate(winner)
         self._enqueue(job)
         return EmailJobResponseDto.model_validate(job)
 

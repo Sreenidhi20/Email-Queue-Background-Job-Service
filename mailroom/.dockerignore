@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.db
+celerybeat-schedule*
+flower.db
+.git/
+tests/
+API collection/

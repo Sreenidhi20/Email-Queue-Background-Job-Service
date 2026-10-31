@@ -12,6 +12,8 @@ class ErrorCode(str, Enum):
     EMAIL_JOB_NOT_DEAD = "EMAIL_JOB_NOT_DEAD"
     SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE"
     QUEUE_UNAVAILABLE = "QUEUE_UNAVAILABLE"
+    INVALID_API_KEY = "INVALID_API_KEY"
+    RATE_LIMITED = "RATE_LIMITED"
     INTERNAL = "INTERNAL"
 
 
@@ -27,6 +29,8 @@ class ErrorCatalog:
         ErrorCode.EMAIL_JOB_NOT_DEAD: "Email job is no longer dead",
         ErrorCode.SERVICE_UNAVAILABLE: "A dependency is unavailable",
         ErrorCode.QUEUE_UNAVAILABLE: "Email queue is unavailable",
+        ErrorCode.INVALID_API_KEY: "Missing or invalid API key",
+        ErrorCode.RATE_LIMITED: "Too many requests",
         ErrorCode.INTERNAL: "Something went wrong on our side",
     }
 
@@ -59,6 +63,11 @@ class AppError(Exception):
     def detail(self) -> str:
         return self._detail or self.error_text
 
+    @property
+    def headers(self) -> dict[str, str]:
+        """Extra HTTP headers for the error response (subclasses may add some)."""
+        return {}
+
 
 class BadRequestError(AppError):
     STATUS_CODE = 400
@@ -74,3 +83,31 @@ class NotFoundError(AppError):
 
 class ServiceUnavailableError(AppError):
     STATUS_CODE = 503
+
+
+class UnauthorizedError(AppError):
+    STATUS_CODE = 401
+
+    @property
+    def headers(self) -> dict[str, str]:
+        return {"WWW-Authenticate": "ApiKey"}
+
+
+class TooManyRequestsError(AppError):
+    STATUS_CODE = 429
+
+    def __init__(self, retry_after_seconds: int, detail: str | None = None) -> None:
+        super().__init__(ErrorCode.RATE_LIMITED, detail)
+        self._retry_after_seconds = retry_after_seconds
+
+    @property
+    def retry_after_seconds(self) -> int:
+        return self._retry_after_seconds
+
+    @property
+    def headers(self) -> dict[str, str]:
+        return {"Retry-After": str(self._retry_after_seconds)}
+
+
+class DuplicateKeyError(Exception):
+    """An insert lost a race against another request using the same idempotency key."""
