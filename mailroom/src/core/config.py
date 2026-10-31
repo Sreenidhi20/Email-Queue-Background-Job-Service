@@ -13,6 +13,13 @@ class Settings(BaseSettings):
     RETRY_BASE_SECONDS: int = 10
     RETRY_MAX_SECONDS: int = 600
     MAX_SEND_AHEAD_DAYS: int = Field(default=7, ge=1, le=30)
+    SENT_RETENTION_DAYS: int = Field(default=30, ge=1, le=365)
+    DIGEST_TO_EMAIL: str | None = None
+    # Beat runs in UTC. 21:30 UTC = 03:00 IST, 02:30 UTC = 08:00 IST.
+    CLEANUP_HOUR_UTC: int = Field(default=21, ge=0, le=23)
+    CLEANUP_MINUTE_UTC: int = Field(default=30, ge=0, le=59)
+    DIGEST_HOUR_UTC: int = Field(default=2, ge=0, le=23)
+    DIGEST_MINUTE_UTC: int = Field(default=30, ge=0, le=59)
 
     @property
     def redis_visibility_timeout_seconds(self) -> int:
