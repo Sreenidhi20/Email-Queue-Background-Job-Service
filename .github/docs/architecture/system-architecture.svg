@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1580" viewBox="0 0 2200 1580">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke" /></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff" />
+<style>text{font-family:Arial,Helvetica,sans-serif}</style>
+<rect x="50" y="170" width="280" height="540" rx="18" fill="#eff6ff" stroke="#2563eb" stroke-width="2" />
+<text x="70" y="206" font-size="20" font-weight="700" fill="#2563eb">CLIENTS</text>
+<text x="70" y="235" font-size="15" fill="#475569">HTTP / JSON</text>
+<rect x="380" y="140" width="480" height="650" rx="18" fill="#f0f9ff" stroke="#0284c7" stroke-width="2" />
+<text x="400" y="176" font-size="20" font-weight="700" fill="#0284c7">FASTAPI APPLICATION</text>
+<text x="400" y="205" font-size="15" fill="#475569">Synchronous request handling</text>
+<rect x="930" y="210" width="280" height="350" rx="18" fill="#fffbeb" stroke="#d97706" stroke-width="2" />
+<text x="950" y="246" font-size="20" font-weight="700" fill="#d97706">REDIS</text>
+<text x="950" y="275" font-size="15" fill="#475569">Broker + rate-limit counters</text>
+<rect x="1280" y="180" width="430" height="500" rx="18" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2" />
+<text x="1300" y="216" font-size="20" font-weight="700" fill="#7c3aed">CELERY WORKER</text>
+<text x="1300" y="245" font-size="15" fill="#475569">Asynchronous execution</text>
+<rect x="1770" y="230" width="380" height="330" rx="18" fill="#ecfdf5" stroke="#059669" stroke-width="2" />
+<text x="1790" y="266" font-size="20" font-weight="700" fill="#059669">MAIL PROVIDERS</text>
+<text x="1790" y="295" font-size="15" fill="#475569">Selected by configuration</text>
+<rect x="50" y="870" width="760" height="390" rx="18" fill="#f8fafc" stroke="#475569" stroke-width="2" />
+<text x="70" y="906" font-size="20" font-weight="700" fill="#475569">HEALTH &amp; MONITORING</text>
+<text x="70" y="935" font-size="15" fill="#475569">Operational visibility</text>
+<rect x="910" y="870" width="470" height="390" rx="18" fill="#fff7ed" stroke="#ea580c" stroke-width="2" />
+<text x="930" y="906" font-size="20" font-weight="700" fill="#ea580c">RELATIONAL DATABASE</text>
+<text x="930" y="935" font-size="15" fill="#475569">PostgreSQL / SQLite for tests</text>
+<rect x="1430" y="850" width="700" height="410" rx="18" fill="#faf5ff" stroke="#9333ea" stroke-width="2" />
+<text x="1450" y="886" font-size="20" font-weight="700" fill="#9333ea">SCHEDULED OPERATIONS</text>
+<text x="1450" y="915" font-size="15" fill="#475569">Celery Beat + maintenance tasks</text>
+<rect x="50" y="1320" width="2080" height="200" rx="18" fill="#f1f5f9" stroke="#334155" stroke-width="2" />
+<text x="70" y="1356" font-size="20" font-weight="700" fill="#334155">RUN &amp; DELIVERY</text>
+<text x="70" y="1385" font-size="15" fill="#475569">Local Compose services and automated CI</text>
+<polyline points="330,315 380,315" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="860,345 930,345" fill="none" stroke="#d97706" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="820,735 885,735 885,1000 910,1000" fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="860,555 905,555 905,505 950,505" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="380,705 330,705" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="1210,340 1280,340" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" stroke-dasharray="9 7" />
+<polyline points="1710,365 1770,365" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="1460,680 1460,790 1345,790 1345,870" fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="1455,950 1390,950 1390,800 1250,800 1250,545 1210,545" fill="none" stroke="#9333ea" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" stroke-dasharray="9 7" />
+<polyline points="810,980 870,980 870,760 1060,760 1060,560" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" stroke-dasharray="9 7" />
+<polyline points="1430,1160 1380,1160" fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<rect x="75" y="245" width="230" height="112" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" />
+<text x="87" y="272" font-size="17" font-weight="700" fill="#2563eb">Postman / API clients</text>
+<text x="87" y="297" font-size="14" fill="#1e293b">Create, inspect, schedule</text>
+<text x="87" y="316" font-size="14" fill="#1e293b">and replay email jobs.</text>
+<rect x="75" y="385" width="230" height="112" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" />
+<text x="87" y="412" font-size="17" font-weight="700" fill="#2563eb">Credentials</text>
+<text x="87" y="437" font-size="14" fill="#1e293b">X-API-Key on protected routes.</text>
+<text x="87" y="456" font-size="14" fill="#1e293b">Idempotency-Key is not auth.</text>
+<rect x="75" y="525" width="230" height="150" rx="12" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" />
+<text x="87" y="552" font-size="17" font-weight="700" fill="#2563eb">Entry points</text>
+<text x="87" y="577" font-size="14" fill="#1e293b">POST /emails</text>
+<text x="87" y="596" font-size="14" fill="#1e293b">GET /emails/{id}</text>
+<text x="87" y="615" font-size="14" fill="#1e293b">GET /dead-letters</text>
+<text x="87" y="634" font-size="14" fill="#1e293b">POST .../replay</text>
+<rect x="405" y="215" width="430" height="90" rx="12" fill="#ffffff" stroke="#0284c7" stroke-width="1.5" />
+<text x="417" y="242" font-size="17" font-weight="700" fill="#0284c7">FastAPI routers + DTOs</text>
+<text x="417" y="267" font-size="14" fill="#1e293b">Validate requests; standard response / error envelopes.</text>
+<rect x="405" y="325" width="430" height="112" rx="12" fill="#ffffff" stroke="#0284c7" stroke-width="1.5" />
+<text x="417" y="352" font-size="17" font-weight="700" fill="#0284c7">Security + rate limiting</text>
+<text x="417" y="377" font-size="14" fill="#1e293b">API-key dependency; POST fixed-window limit in Redis.</text>
+<text x="417" y="396" font-size="14" fill="#1e293b">Health is public; Redis limit failure is fail-open.</text>
+<rect x="405" y="460" width="430" height="135" rx="12" fill="#ffffff" stroke="#0284c7" stroke-width="1.5" />
+<text x="417" y="487" font-size="17" font-weight="700" fill="#0284c7">EmailService</text>
+<text x="417" y="512" font-size="14" fill="#1e293b">Idempotency + sendAt checks; commit queued job,</text>
+<text x="417" y="531" font-size="14" fill="#1e293b">publish job ID / ETA; return 202. Publish failure</text>
+<text x="417" y="550" font-size="14" fill="#1e293b">removes the new row and returns 503.</text>
+<rect x="405" y="620" width="430" height="135" rx="12" fill="#ffffff" stroke="#0284c7" stroke-width="1.5" />
+<text x="417" y="647" font-size="17" font-weight="700" fill="#0284c7">Dead letters + health</text>
+<text x="417" y="672" font-size="14" fill="#1e293b">Replay transaction resets job / letter before publish.</text>
+<text x="417" y="691" font-size="14" fill="#1e293b">Health probes DB + Redis and records probe history.</text>
+<rect x="950" y="290" width="240" height="115" rx="12" fill="#ffffff" stroke="#d97706" stroke-width="1.5" />
+<text x="962" y="317" font-size="17" font-weight="700" fill="#d97706">Celery broker</text>
+<text x="962" y="342" font-size="14" fill="#1e293b">Task messages carry job ID</text>
+<text x="962" y="361" font-size="14" fill="#1e293b">and optional ETA; no email body.</text>
+<rect x="950" y="430" width="240" height="95" rx="12" fill="#ffffff" stroke="#d97706" stroke-width="1.5" />
+<text x="962" y="457" font-size="17" font-weight="700" fill="#d97706">Rate-limit store</text>
+<text x="962" y="482" font-size="14" fill="#1e293b">Redis fixed-window counters</text>
+<text x="962" y="501" font-size="14" fill="#1e293b">for POST /emails.</text>
+<rect x="1305" y="260" width="380" height="105" rx="12" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5" />
+<text x="1317" y="287" font-size="17" font-weight="700" fill="#7c3aed">Task: emails.send</text>
+<text x="1317" y="312" font-size="14" fill="#1e293b">Load job from DB; mark sending; deliver through mailer.</text>
+<rect x="1305" y="390" width="380" height="125" rx="12" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5" />
+<text x="1317" y="417" font-size="17" font-weight="700" fill="#7c3aed">Retry policy</text>
+<text x="1317" y="442" font-size="14" fill="#1e293b">Transient failure -&gt; retrying; exponential backoff</text>
+<text x="1317" y="461" font-size="14" fill="#1e293b">with jitter, capped delay and max-attempt limit.</text>
+<rect x="1305" y="540" width="380" height="105" rx="12" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5" />
+<text x="1317" y="567" font-size="17" font-weight="700" fill="#7c3aed">Terminal / success state</text>
+<text x="1317" y="592" font-size="14" fill="#1e293b">Success -&gt; sent. Exhaustion -&gt; dead + dead_letters</text>
+<text x="1317" y="611" font-size="14" fill="#1e293b">in one DB commit; redelivery does not resend dead jobs.</text>
+<rect x="1800" y="310" width="320" height="95" rx="12" fill="#ffffff" stroke="#059669" stroke-width="1.5" />
+<text x="1812" y="337" font-size="17" font-weight="700" fill="#059669">SMTP</text>
+<text x="1812" y="362" font-size="14" fill="#1e293b">Mailpit for local capture; SMTP in deployments.</text>
+<rect x="1800" y="435" width="320" height="90" rx="12" fill="#ffffff" stroke="#059669" stroke-width="1.5" />
+<text x="1812" y="462" font-size="17" font-weight="700" fill="#059669">Resend</text>
+<text x="1812" y="487" font-size="14" fill="#1e293b">Optional HTTPS API mail backend.</text>
+<rect x="75" y="950" width="330" height="155" rx="12" fill="#ffffff" stroke="#475569" stroke-width="1.5" />
+<text x="87" y="977" font-size="17" font-weight="700" fill="#475569">Health endpoint</text>
+<text x="87" y="1002" font-size="14" fill="#1e293b">GET /health probes SQL + Redis.</text>
+<text x="87" y="1021" font-size="14" fill="#1e293b">Persists health_checks when SQL is available;</text>
+<text x="87" y="1040" font-size="14" fill="#1e293b">reports unavailable if either dependency is down.</text>
+<rect x="435" y="950" width="340" height="155" rx="12" fill="#ffffff" stroke="#475569" stroke-width="1.5" />
+<text x="447" y="977" font-size="17" font-weight="700" fill="#475569">Flower dashboard</text>
+<text x="447" y="1002" font-size="14" fill="#1e293b">Authenticated Celery task monitor;</text>
+<text x="447" y="1021" font-size="14" fill="#1e293b">consumes task events from Redis.</text>
+<rect x="940" y="950" width="195" height="115" rx="12" fill="#ffffff" stroke="#ea580c" stroke-width="1.5" />
+<text x="952" y="977" font-size="17" font-weight="700" fill="#ea580c">Email job</text>
+<text x="952" y="1002" font-size="14" fill="#1e293b">email_jobs</text>
+<text x="952" y="1021" font-size="14" fill="#1e293b">status, attempts, schedule,</text>
+<text x="952" y="1040" font-size="14" fill="#1e293b">idempotency, timestamps</text>
+<rect x="1150" y="950" width="205" height="115" rx="12" fill="#ffffff" stroke="#ea580c" stroke-width="1.5" />
+<text x="1162" y="977" font-size="17" font-weight="700" fill="#ea580c">Dead-letter record</text>
+<text x="1162" y="1002" font-size="14" fill="#1e293b">dead_letters</text>
+<text x="1162" y="1021" font-size="14" fill="#1e293b">failure snapshot + replay flag;</text>
+<text x="1162" y="1040" font-size="14" fill="#1e293b">FK cascades with job deletion</text>
+<rect x="940" y="1095" width="415" height="100" rx="12" fill="#ffffff" stroke="#ea580c" stroke-width="1.5" />
+<text x="952" y="1122" font-size="17" font-weight="700" fill="#ea580c">Health history</text>
+<text x="952" y="1147" font-size="14" fill="#1e293b">health_checks: dependency results and probe timestamps</text>
+<rect x="1455" y="940" width="235" height="105" rx="12" fill="#ffffff" stroke="#9333ea" stroke-width="1.5" />
+<text x="1467" y="967" font-size="17" font-weight="700" fill="#9333ea">Celery Beat</text>
+<text x="1467" y="992" font-size="14" fill="#1e293b">UTC schedules publish</text>
+<text x="1467" y="1011" font-size="14" fill="#1e293b">maintenance task messages.</text>
+<rect x="1710" y="940" width="385" height="145" rx="12" fill="#ffffff" stroke="#9333ea" stroke-width="1.5" />
+<text x="1722" y="967" font-size="17" font-weight="700" fill="#9333ea">Maintenance tasks</text>
+<text x="1722" y="992" font-size="14" fill="#1e293b">Cleanup deletes only old sent jobs.</text>
+<text x="1722" y="1011" font-size="14" fill="#1e293b">Daily digest counts statuses and queues</text>
+<text x="1722" y="1030" font-size="14" fill="#1e293b">through EmailService; blank recipient skips.</text>
+<rect x="1455" y="1110" width="640" height="105" rx="12" fill="#ffffff" stroke="#9333ea" stroke-width="1.5" />
+<text x="1467" y="1137" font-size="17" font-weight="700" fill="#9333ea">Configuration &amp; safety</text>
+<text x="1467" y="1162" font-size="14" fill="#1e293b">Run one Beat instance. Replay is conditional; publish failure restores prior state.</text>
+<rect x="75" y="1395" width="960" height="100" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.5" />
+<text x="87" y="1422" font-size="17" font-weight="700" fill="#334155">Docker Compose</text>
+<text x="87" y="1447" font-size="14" fill="#1e293b">Local: Redis + Mailpit. App profile: PostgreSQL, migrations, API, worker, Beat, Flower.</text>
+<rect x="1070" y="1395" width="1020" height="100" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.5" />
+<text x="1082" y="1422" font-size="17" font-weight="700" fill="#334155">GitHub Actions</text>
+<text x="1082" y="1447" font-size="14" fill="#1e293b">Unit tests; SQLite migration upgrade / downgrade; Docker build and Compose validation.</text>
+<text x="50" y="64" font-size="30" font-weight="700" fill="#0f172a">MAILROOM  |  EMAIL QUEUE &amp; BACKGROUND JOB SERVICE</text>
+<text x="50" y="112" font-size="18" fill="#475569">Accepted synchronously; delivered asynchronously. Persistent job state is authoritative in the relational database.</text>
+<rect x="320" y="275" width="120" height="28" rx="5" fill="#ffffff" />
+<text x="325" y="294" font-size="13" font-weight="600" fill="#2563eb">1  HTTP request</text>
+<rect x="925" y="175" width="152" height="28" rx="5" fill="#ffffff" />
+<text x="930" y="194" font-size="13" font-weight="600" fill="#d97706">2  rate-limit check</text>
+<rect x="825" y="765" width="240" height="28" rx="5" fill="#ffffff" />
+<text x="830" y="784" font-size="13" font-weight="600" fill="#ea580c">3  commit / replay transaction</text>
+<rect x="865" y="565" width="184" height="28" rx="5" fill="#ffffff" />
+<text x="870" y="584" font-size="13" font-weight="600" fill="#7c3aed">4  publish job ID + ETA</text>
+<rect x="180" y="715" width="120" height="28" rx="5" fill="#ffffff" />
+<text x="185" y="734" font-size="13" font-weight="600" fill="#2563eb">5  202 Accepted</text>
+<rect x="1100" y="165" width="120" height="28" rx="5" fill="#ffffff" />
+<text x="1105" y="184" font-size="13" font-weight="600" fill="#7c3aed">6  async task</text>
+<rect x="1710" y="185" width="120" height="28" rx="5" fill="#ffffff" />
+<text x="1715" y="204" font-size="13" font-weight="600" fill="#059669">7  SMTP / HTTPS</text>
+<rect x="1370" y="735" width="248" height="28" rx="5" fill="#ffffff" />
+<text x="1375" y="754" font-size="13" font-weight="600" fill="#ea580c">8  persist status / dead letter</text>
+<rect x="1185" y="755" width="240" height="28" rx="5" fill="#ffffff" />
+<text x="1190" y="774" font-size="13" font-weight="600" fill="#9333ea">Beat publishes scheduled tasks</text>
+<rect x="865" y="720" width="208" height="28" rx="5" fill="#ffffff" />
+<text x="870" y="739" font-size="13" font-weight="600" fill="#475569">Flower reads Celery events</text>
+<rect x="1210" y="1210" width="192" height="28" rx="5" fill="#ffffff" />
+<text x="1215" y="1229" font-size="13" font-weight="600" fill="#ea580c">DB counts / sent cleanup</text>
+<text x="50" y="1552" font-size="14" fill="#475569">Solid = request / persistence  |  Dashed = asynchronous task or event  |  Numbered arrows = primary email enqueue and delivery path</text>
+</svg>
