@@ -1,10 +1,11 @@
 from uuid import UUID
 
 from sqlalchemy import func, select, update
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from src.core.enums import EmailStatus
+from src.core.errors import DuplicateKeyError
 from src.domain.dead_letter import DeadLetter
 from src.domain.email_job import EmailJob
 
@@ -17,7 +18,14 @@ class EmailQuery:
 
     def add(self, job: EmailJob) -> EmailJob:
         self._session.add(job)
-        return self._commit(job)
+        try:
+            return self._commit(job)
+        except IntegrityError as error:
+            # Two requests with the same Idempotency-Key raced and this one lost.
+            key = job.idempotency_key
+            if key is not None and self.get_by_idempotency_key(key) is not None:
+                raise DuplicateKeyError(key) from error
+            raise
 
     def save(self, job: EmailJob) -> EmailJob:
         return self._commit(job)

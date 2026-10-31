@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from src.core.config import settings
 from src.core.database import db
 from src.core.exception_handlers import ExceptionHandlers
+from src.core.security import api_key_auth
 from src.features.dead_letters.dead_letter_router import DeadLetterRouter
 from src.features.emails.email_router import EmailRouter
 from src.features.health.health_router import HealthRouter
@@ -14,6 +15,7 @@ from src.infrastructure.redis import redis_client
 
 class Application:
     def __init__(self) -> None:
+        api_key_auth.assert_configured()
         self._app = FastAPI(title=settings.APP_NAME, lifespan=self._lifespan)
         ExceptionHandlers.register(self._app)
         self._register_routers()

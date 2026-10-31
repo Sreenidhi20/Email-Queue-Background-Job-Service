@@ -8,6 +8,7 @@ from src.core.database import db
 from src.core.dto import PageDto
 from src.core.enums import EmailStatus
 from src.core.responses import ApiResponse
+from src.core.security import api_key_auth
 from src.features.emails.dto.email_dto import (
     CreateEmailRequestDto,
     EmailJobResponseDto,
@@ -15,6 +16,7 @@ from src.features.emails.dto.email_dto import (
 from src.features.emails.email_query import EmailQuery
 from src.features.emails.email_service import EmailService
 from src.infrastructure.celery_task_publisher import CeleryTaskPublisher
+from src.infrastructure.rate_limiter import create_email_rate_limit
 
 
 def get_email_service(
@@ -29,7 +31,11 @@ def get_email_service(
 
 class EmailRouter:
     def __init__(self) -> None:
-        self._router = APIRouter(prefix="/emails", tags=["Emails"])
+        self._router = APIRouter(
+            prefix="/emails",
+            tags=["Emails"],
+            dependencies=[Depends(api_key_auth)],
+        )
         self._register_routes()
 
     @property
@@ -42,6 +48,7 @@ class EmailRouter:
             self._create_email,
             methods=["POST"],
             status_code=202,
+            dependencies=[Depends(create_email_rate_limit)],
             response_model=ApiResponse[EmailJobResponseDto],
             summary="Queue an email",
         )

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -10,6 +12,13 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 1025
+    MAIL_BACKEND: Literal["smtp", "resend"] = "smtp"
+    MAIL_FROM: str = "noreply@mailroom.local"
+    RESEND_API_KEY: str = ""
+    # "name:key,name2:key2". Each key must be at least 16 characters.
+    API_KEYS: str = ""
+    REQUIRE_API_KEY: bool = True
+    RATE_LIMIT_PER_MINUTE: int = Field(default=60, ge=1, le=100_000)
     RETRY_BASE_SECONDS: int = 10
     RETRY_MAX_SECONDS: int = 600
     MAX_SEND_AHEAD_DAYS: int = Field(default=7, ge=1, le=30)

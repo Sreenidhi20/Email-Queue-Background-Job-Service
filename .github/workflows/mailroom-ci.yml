@@ -22,6 +22,7 @@ jobs:
     env:
       DATABASE_URL: sqlite:///./ci.db
       REDIS_URL: redis://localhost:6379/0
+      API_KEYS: ci:ci-test-key-0123456789
     steps:
       - uses: actions/checkout@v4
 
@@ -41,3 +42,17 @@ jobs:
         run: |
           alembic upgrade head
           alembic downgrade base
+
+  docker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t mailroom ./mailroom
+
+      - name: Compose file is valid
+        run: docker compose -f mailroom/docker-compose.yml --profile app config -q
